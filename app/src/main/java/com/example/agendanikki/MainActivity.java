@@ -120,9 +120,9 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = BancoDados.buscarDados(this);
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                String descricao = cursor.getString(cursor.getColumnIndex("descricao"));
-                String data = cursor.getString(cursor.getColumnIndex("data"));
-                String hora = cursor.getString(cursor.getColumnIndex("hora"));
+                @SuppressLint("Range") String descricao = cursor.getString(cursor.getColumnIndex("descricao"));
+                @SuppressLint("Range") String data = cursor.getString(cursor.getColumnIndex("data"));
+                @SuppressLint("Range") String hora = cursor.getString(cursor.getColumnIndex("hora"));
 
                 Compromisso compromisso = new Compromisso(descricao, data, hora);
                 compromissos.add(compromisso);
