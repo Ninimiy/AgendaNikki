@@ -1,5 +1,6 @@
 package com.example.agendanikki;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.database.Cursor;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //parte da interface
         et_descricao = findViewById(R.id.et_descricao);
         bt_data = findViewById(R.id.bt_data);
         bt_hora = findViewById(R.id.bt_hora);
@@ -45,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
         BancoDados.abrirBanco(this);
         BancoDados.abrirTabelaCompromissos(this);
-        BancoDados.fecharDB();
 
+        //escolher data
         bt_data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //escolher hora
         bt_hora.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,13 +64,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //obtém a descrição, data e hora do compromisso e insere no banco de dados
+        //e atualiza a lista de compromissos.
         bt_salvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 inserirCompromisso();
             }
         });
+        //carrega os compromissos armazenados no banco de dados e adiciona na lista compromissos
         carregarCompromissosDoBanco();
+        BancoDados.fecharDB();
+
+        //usado para deletar compromissos individualmente, cada compromisso
+        //tem seu próprio botão de deletar
         compromissoAdapter.setOnDeleteClickListener(new CompromissoAdapter.OnDeleteClickListener() {
             @Override
             public void onDeleteClick(int position) {
@@ -93,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 }, hora, minuto, true);
         timePickerDialog.show();
     }
+    //funcao para pegar a data no formato de calendario na hora da seleção
     public void selectDate() {
         final Calendar calendar = Calendar.getInstance();
         int ano = calendar.get(Calendar.YEAR);
@@ -107,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 }, ano, mes, dia);
         datePickerDialog.show();
     }
+    //funcao para pegar a hora no formato de um relogio na hora da seleção
     private void inserirCompromisso() {
         String st_descricao = et_descricao.getText().toString();
         Compromisso compromisso = new Compromisso(st_descricao, data, horas);
@@ -115,17 +127,24 @@ public class MainActivity extends AppCompatActivity {
         compromissoAdapter.notifyDataSetChanged();
         et_descricao.setText("");
     }
+    //carrega os compromissos armazenados no banco de dados e coloca na lista de compromissos
     private void carregarCompromissosDoBanco() {
         compromissos.clear();
         Cursor cursor = BancoDados.buscarDados(this);
         if (cursor != null && cursor.moveToFirst()) {
-            do {
-                @SuppressLint("Range") String descricao = cursor.getString(cursor.getColumnIndex("descricao"));
-                @SuppressLint("Range") String data = cursor.getString(cursor.getColumnIndex("data"));
-                @SuppressLint("Range") String hora = cursor.getString(cursor.getColumnIndex("hora"));
+            int descricaoIndex = cursor.getColumnIndex("descricao");
+            int dataIndex = cursor.getColumnIndex("data");
+            int horaIndex = cursor.getColumnIndex("hora");
 
-                Compromisso compromisso = new Compromisso(descricao, data, hora);
-                compromissos.add(compromisso);
+            do {
+                if (descricaoIndex >= 0 && dataIndex >= 0 && horaIndex >= 0) {
+                    String descricao = cursor.getString(descricaoIndex);
+                    String data = cursor.getString(dataIndex);
+                    String hora = cursor.getString(horaIndex);
+
+                    Compromisso compromisso = new Compromisso(descricao, data, hora);
+                    compromissos.add(compromisso);
+                }
             } while (cursor.moveToNext());
 
             cursor.close();
@@ -133,4 +152,5 @@ public class MainActivity extends AppCompatActivity {
             compromissoAdapter.notifyDataSetChanged();
         }
     }
+
 }
