@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private CompromissoAdapter compromissoAdapter;
     private List<Compromisso> compromissos = new ArrayList<>();
 
+    private int lastUsedId = 0;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,11 +85,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDeleteClick(int position) {
                 Compromisso compromisso = compromissos.get(position);
+                int id = compromisso.getId(); // Obtenha o ID do compromisso da lista
+                BancoDados.excluirCompromisso(id, MainActivity.this);
+
                 compromissos.remove(position);
                 compromissoAdapter.notifyItemRemoved(position);
-                BancoDados.abrirBanco(MainActivity.this);
-                BancoDados.fecharDB();
             }
+
         });
 
     }
@@ -121,12 +126,15 @@ public class MainActivity extends AppCompatActivity {
     //funcao para pegar a hora no formato de um relogio na hora da seleção
     private void inserirCompromisso() {
         String st_descricao = et_descricao.getText().toString();
-        Compromisso compromisso = new Compromisso(st_descricao, data, horas);
+        int newId = ++lastUsedId; // Incrementa o ID
+        Compromisso compromisso = new Compromisso(newId, st_descricao, data, horas);
+
         BancoDados.inserirCompromisso(st_descricao, data, horas, this);
         compromissos.add(compromisso);
         compromissoAdapter.notifyDataSetChanged();
         et_descricao.setText("");
     }
+
     //carrega os compromissos armazenados no banco de dados e coloca na lista de compromissos
     private void carregarCompromissosDoBanco() {
         compromissos.clear();
@@ -135,22 +143,28 @@ public class MainActivity extends AppCompatActivity {
             int descricaoIndex = cursor.getColumnIndex("descricao");
             int dataIndex = cursor.getColumnIndex("data");
             int horaIndex = cursor.getColumnIndex("hora");
+            int idIndex = cursor.getColumnIndex("id");
 
             do {
                 if (descricaoIndex >= 0 && dataIndex >= 0 && horaIndex >= 0) {
                     String descricao = cursor.getString(descricaoIndex);
                     String data = cursor.getString(dataIndex);
                     String hora = cursor.getString(horaIndex);
+                    int id = cursor.getInt(idIndex);
 
-                    Compromisso compromisso = new Compromisso(descricao, data, hora);
+                    Compromisso compromisso = new Compromisso(id, descricao, data, hora);
                     compromissos.add(compromisso);
+                    lastUsedId = Math.max(lastUsedId, id); // Atualiza o lastUsedId
                 }
             } while (cursor.moveToNext());
-
             cursor.close();
-
             compromissoAdapter.notifyDataSetChanged();
         }
     }
+
+
+
+
+
 
 }

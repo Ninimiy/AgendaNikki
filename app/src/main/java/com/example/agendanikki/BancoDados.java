@@ -43,17 +43,33 @@ public class BancoDados {
     //serve para inserir um novo compromisso na tabela "compromissos"
     //abre o banco primeiro e executa a consulta SQL para inserir os dados na tabela
     //mostra uma alerta e depois fecha o banco de dados
-    public static void inserirCompromisso(String descricao, String data, String hora, Activity act){
+    public static long inserirCompromisso(String descricao, String data, String hora, Activity act) {
         abrirBanco(act);
         try {
-            abrirTabelaCompromissos(act); // Abra a tabela de compromissos
-            db.execSQL("INSERT INTO compromissos (descricao, data, hora) VALUES ('" + descricao + "','" + data + "','" + hora + "')");
+            abrirTabelaCompromissos(act);
+
+            ContentValues values = new ContentValues();
+            values.put("descricao", descricao);
+            values.put("data", data);
+            values.put("hora", hora);
+
+            long id = db.insert("compromissos", null, values);
+            return id;
+        } catch (Exception ex) {
+            Msg.mostrar("Erro ao inserir compromisso: " + ex.getMessage(), act);
+            return -1; // Retorna -1 em caso de erro
+        } finally {
+            fecharDB();
         }
-        catch (Exception ex) {
-            Msg.mostrar("Erro ao inserir compromisso:" + ex.getMessage(), act);
-        }
-        finally {
-            Msg.mostrar("Compromisso inserido", act);
+    }
+    public static void excluirCompromisso(int id, Activity act) {
+        abrirBanco(act);
+        try {
+            abrirTabelaCompromissos(act);
+            db.execSQL("DELETE FROM compromissos WHERE id = " + id);
+        } catch (Exception ex) {
+            Msg.mostrar("Erro ao excluir compromisso: " + ex.getMessage(), act);
+        } finally {
             fecharDB();
         }
     }
@@ -64,7 +80,7 @@ public class BancoDados {
         abrirBanco(act);
 
         cursor = db.query("compromissos",
-                new String[]{"descricao", "data", "hora"},
+                new String[]{"id","descricao", "data", "hora"},
                 null,
                 null,
                 null,

@@ -70,7 +70,7 @@ public class CompromissoAdapter extends RecyclerView.Adapter<CompromissoAdapter.
         }
     }
     // acionado quando o botão de exclusão é clicado e recebe a posição do
-    // compromisso que vai ser deletado como argumento.
+    // compromisso que vai ser excluído como argumento.
     public interface OnDeleteClickListener {
         void onDeleteClick(int position);
     }
