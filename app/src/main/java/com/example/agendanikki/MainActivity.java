@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
     private int lastUsedId = 0;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);

@@ -34,7 +34,9 @@ public class CompromissoAdapter extends RecyclerView.Adapter<CompromissoAdapter.
         return new ViewHolder(view);
     }
     //vincula os dados do viewholder
+
     @Override
+
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Compromisso compromisso = compromissos.get(position);
         holder.descricaoTextView.setText(compromisso.getDescricao());
@@ -42,9 +44,11 @@ public class CompromissoAdapter extends RecyclerView.Adapter<CompromissoAdapter.
         holder.horaTextView.setText(compromisso.getHora());
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
+            //mostra a posição precisa dos items da tela
             public void onClick(View v) {
+                int itemPosition = holder.getAbsoluteAdapterPosition();
                 if (onDeleteClickListener != null) {
-                    onDeleteClickListener.onDeleteClick(position);
+                    onDeleteClickListener.onDeleteClick(itemPosition);
                 }
             }
         });
